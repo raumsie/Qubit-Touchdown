@@ -50,7 +50,6 @@ class QubitTouchdown:
         return len(self.player_hands[0]) == 0 and len(self.player_hands[1]) == 0 and len(self.deck) == 0
 
     def get_winner(self):
-        # Determine the winner based on scores
         if self.player_scores[0] > self.player_scores[1]:
             return "Player 1"
         elif self.player_scores[1] > self.player_scores[0]:
@@ -533,4 +532,5 @@ class QubitTouchdownGUI:
 
 if __name__ == "__main__":
     game_gui = QubitTouchdownGUI()
+
     game_gui.run()
