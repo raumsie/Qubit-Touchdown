@@ -4,7 +4,11 @@ Developed by Raumsie Gaballa for educational purposes.
 
 Required packages:
 python
+
 numpy
+
 pennylane
+
 tkinter
+
 matplotlib
