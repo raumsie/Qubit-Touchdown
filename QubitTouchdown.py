@@ -13,7 +13,7 @@ from PIL import Image, ImageDraw, ImageTk
 # Ten quantum-computing facts.
 # One is shown after each AI move.
 # They can be toggled off in-game.
-# TODO: Add more facts.
+# TODO: Add more facts
 # =============================================================================
 QUANTUM_FACTS = [
     "A qubit can be in a superposition of |0⟩ and |1⟩ at once, until it is measured.",
