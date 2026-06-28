@@ -637,7 +637,15 @@ class QubitTouchdownGUI:
         self._owns_root = root is None
         self.root = root if root is not None else tk.Tk()
         self.root.title("Qubit Touchdown")
-        self.root.geometry("1320x860")  # Check if this resolution is good
+
+        # Window geometry
+        window_width = 1320
+        window_height = 860
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+        center_x = int(screen_width / 2 - window_width / 2)
+        center_y = int(screen_height / 2 - window_height / 2)
+        self.root.geometry(f"{window_width}x{window_height}+{center_x}+{center_y}")  # Check if this resolution is good
 
         self.is_ai = is_ai
         self.game = QubitTouchdown(is_ai=is_ai)
@@ -953,7 +961,8 @@ class StartScreen:
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("Qubit Touchdown")
-        self.root.geometry("420x320") #TODO: Make StartScreen bigger
+        # self.root.geometry("420x320") #TODO: Make StartScreen bigger
+        self.root.geometry("600x320")
 
         # A container to destroy when the game starts
         self.container = ttk.Frame(self.root, padding="30")
