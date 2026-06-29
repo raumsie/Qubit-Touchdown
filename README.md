@@ -43,8 +43,11 @@ In Qubit Touchdown, players take turns playing cards that apply quantum gates to
 
 ## Screenshots
 - Start screen
+
   ![Start Screen](./images/Start_Screen.png)
+
 - Main game window (3D sphere + 2D board + hand)
+
   ![Main Window](./images/GameWindow.png)
 ---
 
