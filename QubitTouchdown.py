@@ -364,6 +364,8 @@ class QubitTouchdown:
         if not hand:
             return 0
 
+        print(f"DEBUG[AI]: Hand: {hand}")
+
         best_idx = None
         best_dist = float('inf')
 
@@ -382,7 +384,8 @@ class QubitTouchdown:
                 best_idx = i
 
         # 3. Only commit to the best card if it is a genuine improvement over
-        #    just standing still. Otherwise, play randomly.
+        # just standing still. Otherwise, play randomly.
+        # TODO: Prevent AI from playing measurement inside target endzone
         current_dist = self._distance_to_target(self.current_state)
         if best_idx is None or best_dist >= current_dist - 1e-9:
             choice = random.randrange(len(hand))
@@ -443,14 +446,6 @@ class BlochSphere3D:
             offset = 0.15
             label_pos = (pos[0] + offset, pos[1] + offset, pos[2] + offset)
             self.ax.text(*label_pos, state, fontsize=12, ha='center')
-
-        # Highlight endzones
-        self.ax.scatter(1, 0, 0, color='purple', s=300, alpha=0.2)
-        self.ax.scatter(-1, 0, 0, color='green', s=300, alpha=0.2)
-
-        # Endzone labels
-        self.ax.text(1.3, 0, .4, 'P2 Endzone\n( P1 score here)', color='purple', fontsize=10, ha='center')
-        self.ax.text(-1.3, 0, .4, 'P1 Endzone\n(P2 score here)', color='green', fontsize=10, ha='center')
 
         # Draw axes
         axis_length = 1.2
@@ -582,11 +577,10 @@ class BoardView(tk.Canvas):
         """Redraw the whole board and highlight current_state"""
         self.delete('all')
 
-        # Top endzone (purple) = Player 2's endzone, where Player 1 scores (|+⟩).
+        # Top endzone (blue) = Player 2's endzone, where Player 1 scores (|+⟩).
         self.create_rectangle(0, 0, self.WIDTH, 120, fill='#3a1c5a', outline='')
-        # Bottom endzone (green) = Player 1's endzone, where Player 2 scores (|-⟩).
-        self.create_rectangle(0, self.HEIGHT - 120, self.WIDTH, self.HEIGHT,
-                              fill='#13501a', outline='')
+        # Bottom endzone (orange) = Player 1's endzone, where Player 2 scores (|-⟩).
+        self.create_rectangle(0, self.HEIGHT - 120, self.WIDTH, self.HEIGHT, fill='#cd7f32', outline='')
         # Decorative yard lines
         for yy in (120, 220, 320, 425):
             self.create_line(0, yy, self.WIDTH, yy, fill='#2f7d36', width=1)
@@ -611,8 +605,8 @@ class BoardView(tk.Canvas):
         # --- tiny caption noting the gates that don't move the qubit ---
         # TODO: Change this once the endzone logic is fixed
         self.create_text(self.WIDTH / 2, self.HEIGHT - 8,
-                         text="I keeps the ball still · poles also stay under Z/S",
-                         fill='#cfe8cf', font=('Arial', 8))
+                         text="Identity (I) gate keeps the ball still.",
+                         fill='#000000', font=('Arial', 8))
 
     def _draw_highlight(self, x, y):
         r = self.NODE_R + 6
@@ -677,8 +671,8 @@ class QubitTouchdownGUI:
         instructions = ttk.Label(left_frame,
                                  text=mode_line +
                                       "Score by moving the ball into your OPPONENT'S endzone.\n"
-                                      "Player 1 scores in |+⟩ (purple)\n"
-                                      "Player 2 scores in |-⟩ (green)",
+                                      "Player 1 scores in |+⟩\n"
+                                      "Player 2 scores in |-⟩",
                                  font=("Arial", 10),
                                  justify=tk.CENTER)
         instructions.pack(pady=5)
@@ -749,7 +743,7 @@ class QubitTouchdownGUI:
         # 2D board
         board_holder = ttk.Frame(viz_frame)
         board_holder.pack(side=tk.LEFT, fill=tk.Y, padx=(5, 10), pady=10)
-        ttk.Label(board_holder, text="Game Board (gate map)", font=("Arial", 11, "bold")).pack(pady=(0, 4))
+        ttk.Label(board_holder, text="Game Board", font=("Arial", 11, "bold")).pack(pady=(0, 4))
         self.board_view = BoardView(board_holder)
         self.board_view.pack()
 
@@ -759,8 +753,8 @@ class QubitTouchdownGUI:
         states_info = [
             ("|0⟩", "North Pole - Start Position"),
             ("|1⟩", "South Pole - Start Position"),
-            ("|+⟩", "Player 2's Endzone (Purple) - Player 1 scores here"),
-            ("|-⟩", "Player 1's Endzone (Green) - Player 2 scores here"),
+            ("|+⟩", "Player 2's Endzone - Player 1 scores here"),
+            ("|-⟩", "Player 1's Endzone - Player 2 scores here"),
             ("|i⟩", "+Y Axis"),
             ("|-i⟩", "-Y Axis")
         ]
@@ -869,7 +863,7 @@ class QubitTouchdownGUI:
     # Prompt the user to restart or exit
     def ask_restart_or_exit(self):
         self.cancel_ai_turn()
-        response = messagebox.askquestion("Restart?", "Do you want to restart?")
+        response = messagebox.askquestion("Restart?", "Select 'Yes' to restart or 'No' to exit.")
         if response == "yes":
             self.restart_game()
         else:
